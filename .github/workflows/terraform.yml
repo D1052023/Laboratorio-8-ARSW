@@ -37,7 +37,9 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan
-      run: terraform plan -var-file=infra/env/dev.tfvars infra
+      run: |
+       cd infra
+       terraform plan -var-file=env/dev.tfvars
 
   apply:
     needs: terraform
@@ -62,4 +64,6 @@ jobs:
     # 🔧 FIX AQUÍ TAMBIÉN
     - run: terraform init -backend-config=infra/backend.hcl
 
-    - run: terraform apply -var-file=infra/env/dev.tfvars -auto-approve infra
+    - run: |
+       cd infra
+       terraform apply -var-file=env/dev.tfvars -auto-approve
