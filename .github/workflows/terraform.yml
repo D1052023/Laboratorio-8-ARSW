@@ -26,20 +26,20 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
-    # 🔥 INIT CORREGIDO (clave)
+    # 🔧 FIX AQUÍ
     - name: Terraform Init
-      run: terraform -chdir=infra init -backend-config=infra/backend.hcl
+      run: terraform init -backend-config=infra/backend.hcl
 
     - name: Terraform Format
-      run: terraform -chdir=infra fmt -recursive
+      run: terraform fmt -recursive
 
     - name: Terraform Validate
-      run: terraform -chdir=infra validate
+      run: terraform validate
 
-    # 🔥 PLAN CORRECTO
     - name: Terraform Plan
-      run: terraform -chdir=infra plan -var-file=env/dev.tfvars
-
+      run: |
+       cd infra
+       terraform plan -var-file=env/dev.tfvars
   apply:
     needs: terraform
     runs-on: ubuntu-latest
@@ -60,10 +60,9 @@ jobs:
 
     - uses: hashicorp/setup-terraform@v2
 
-    # 🔥 MISMO INIT
-    - name: Terraform Init
-      run: terraform -chdir=infra init -backend-config=infra/backend.hcl
+    # 🔧 FIX AQUÍ TAMBIÉN
+    - run: terraform init -backend-config=infra/backend.hcl
 
-    # 🔥 APPLY CORRECTO
-    - name: Terraform Apply
-      run: terraform -chdir=infra apply -var-file=env/dev.tfvars -auto-approve
+    - run: |
+       cd infra
+       terraform apply -var-file=env/dev.tfvars -auto-approve
