@@ -26,20 +26,25 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
-    # 🔧 FIX AQUÍ
+    # ✅ INIT EN EL MISMO DIRECTORIO
     - name: Terraform Init
-      run: terraform init -backend-config=infra/backend.hcl
+      run: |
+        cd infra
+        terraform init -backend-config=backend.hcl
 
     - name: Terraform Format
       run: terraform fmt -recursive
 
     - name: Terraform Validate
-      run: terraform validate
+      run: |
+        cd infra
+        terraform validate
 
+    # ✅ PLAN EN EL MISMO DIRECTORIO
     - name: Terraform Plan
       run: |
-       cd infra
-       terraform plan -var-file=env/dev.tfvars
+        cd infra
+        terraform plan -var-file=env/dev.tfvars
 
   apply:
     needs: terraform
@@ -61,9 +66,10 @@ jobs:
 
     - uses: hashicorp/setup-terraform@v2
 
-    # 🔧 FIX AQUÍ TAMBIÉN
-    - run: terraform init -backend-config=infra/backend.hcl
+    - run: |
+        cd infra
+        terraform init -backend-config=backend.hcl
 
     - run: |
-       cd infra
-       terraform apply -var-file=env/dev.tfvars -auto-approve
+        cd infra
+        terraform apply -var-file=env/dev.tfvars -auto-approve
