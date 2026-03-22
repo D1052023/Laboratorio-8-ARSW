@@ -31,7 +31,7 @@ jobs:
       uses: hashicorp/setup-terraform@v2
 
     - name: Terraform Init
-      run: terraform init -backend-config=backend.hcl
+      run: terraform init -backend-config=../backend.hcl
 
     - name: Terraform Format
       run: terraform fmt -recursive
@@ -70,7 +70,7 @@ jobs:
       uses: hashicorp/setup-terraform@v2
 
     - name: Terraform Init
-      run: terraform init -backend-config=backend.hcl
+      run: terraform init -backend-config=../backend.hcl
 
     - name: Terraform Apply
       run: terraform apply -var-file=env/dev.tfvars -auto-approve
