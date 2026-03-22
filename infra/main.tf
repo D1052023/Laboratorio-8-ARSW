@@ -35,3 +35,22 @@ module "lb" {
   allow_ssh_from_cidr = var.allow_ssh_from_cidr
   tags                = var.tags
 }
+resource "azurerm_consumption_budget_resource_group" "budget" {
+  name              = "${var.prefix}-budget"
+  resource_group_id = azurerm_resource_group.rg.id
+  amount            = 10 # Límite de 10 dólares
+  time_grain        = "Monthly"
+
+  time_period {
+    start_date = "2026-03-01T00:00:00Z" # Mes actual
+  }
+
+  notification {
+    enabled   = true
+    threshold = 80.0 # Notificar al llegar a 8 USD
+    operator  = "GreaterThan"
+    contact_emails = [
+      "oscar.sporras@mail.escuelaing.edu.co" # Cambia esto por tu correo real
+    ]
+  }
+}
