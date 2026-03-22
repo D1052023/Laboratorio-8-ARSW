@@ -26,9 +26,9 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
-    # ✅ TODO usando el mismo contexto (infra)
+    # 🔥 INIT CORREGIDO (clave)
     - name: Terraform Init
-      run: terraform -chdir=infra init -backend-config=backend.hcl
+      run: terraform -chdir=infra init -backend-config=infra/backend.hcl
 
     - name: Terraform Format
       run: terraform -chdir=infra fmt -recursive
@@ -36,6 +36,7 @@ jobs:
     - name: Terraform Validate
       run: terraform -chdir=infra validate
 
+    # 🔥 PLAN CORRECTO
     - name: Terraform Plan
       run: terraform -chdir=infra plan -var-file=env/dev.tfvars
 
@@ -59,8 +60,10 @@ jobs:
 
     - uses: hashicorp/setup-terraform@v2
 
+    # 🔥 MISMO INIT
     - name: Terraform Init
-      run: terraform -chdir=infra init -backend-config=backend.hcl
+      run: terraform -chdir=infra init -backend-config=infra/backend.hcl
 
+    # 🔥 APPLY CORRECTO
     - name: Terraform Apply
       run: terraform -chdir=infra apply -var-file=env/dev.tfvars -auto-approve
