@@ -36,7 +36,7 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan
-      run: terraform plan -var-file=env/dev.tfvars
+      run: terraform plan -var-file=infra/env/dev.tfvars
 
   apply:
     needs: terraform
@@ -59,4 +59,4 @@ jobs:
     - uses: hashicorp/setup-terraform@v2
 
     - run: terraform init -backend-config=infra/backend.hcl
-    - run: terraform apply -var-file=env/dev.tfvars -auto-approve
+    - run: terraform apply -var-file=infra/env/dev.tfvars -auto-approve
