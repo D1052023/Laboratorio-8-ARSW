@@ -6,8 +6,9 @@ on:
 
 jobs:
   terraform:
+    name: 'Terraform Plan'
     runs-on: ubuntu-latest
-    # 💡 Esto hace que todos los 'run' de este job se ejecuten en 'infra' por defecto
+    # Forzamos que todos los comandos se ejecuten en la carpeta 'infra'
     defaults:
       run:
         working-directory: infra
@@ -31,8 +32,13 @@ jobs:
       uses: hashicorp/setup-terraform@v2
 
     - name: Terraform Init
-      # Ahora el path al archivo hcl es relativo a la carpeta 'infra'
+      # Pasamos las credenciales explícitamente para el Backend
       run: terraform init -backend-config=backend.hcl
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
 
     - name: Terraform Format
       run: terraform fmt -recursive
@@ -41,10 +47,15 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan
-      # Ya no necesitas el 'cd infra'
       run: terraform plan -var-file=env/dev.tfvars
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
 
   apply:
+    name: 'Terraform Apply'
     needs: terraform
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
@@ -57,18 +68,31 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-    - uses: azure/login@v1
+    - name: Azure Login (OIDC)
+      uses: azure/login@v1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - uses: hashicorp/setup-terraform@v2
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
 
     - name: Terraform Init
       run: terraform init -backend-config=backend.hcl
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
 
     - name: Terraform Apply
       run: terraform apply -var-file=env/dev.tfvars -auto-approve
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
