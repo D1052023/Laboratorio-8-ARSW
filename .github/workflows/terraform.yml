@@ -28,7 +28,7 @@ jobs:
 
     # 🔧 FIX AQUÍ
     - name: Terraform Init
-      run: terraform -chdir=infra init -backend-config=backend.hcl
+      run: terraform init -backend-config=infra/backend.hcl
 
     - name: Terraform Format
       run: terraform fmt -recursive
@@ -37,7 +37,7 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan
-      run: terraform -chdir=infra plan -var-file=env/dev.tfvars
+      run: terraform plan -var-file=infra/env/dev.tfvars infra
 
   apply:
     needs: terraform
@@ -60,6 +60,6 @@ jobs:
     - uses: hashicorp/setup-terraform@v2
 
     # 🔧 FIX AQUÍ TAMBIÉN
-    - run: terraform -chdir=infra init -backend-config=backend.hcl
+    - run: terraform init -backend-config=infra/backend.hcl
 
-    - run: terraform -chdir=infra apply -var-file=env/dev.tfvars -auto-approve
+    - run: terraform apply -var-file=infra/env/dev.tfvars -auto-approve infra
