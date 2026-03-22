@@ -7,6 +7,10 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    # 💡 Esto hace que todos los 'run' de este job se ejecuten en 'infra' por defecto
+    defaults:
+      run:
+        working-directory: infra
 
     permissions:
       id-token: write
@@ -26,9 +30,9 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
-    # 🔧 FIX AQUÍ
     - name: Terraform Init
-      run: terraform init -backend-config=infra/backend.hcl
+      # Ahora el path al archivo hcl es relativo a la carpeta 'infra'
+      run: terraform init -backend-config=backend.hcl
 
     - name: Terraform Format
       run: terraform fmt -recursive
@@ -37,13 +41,16 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan
-      run: |
-       cd infra
-       terraform plan -var-file=env/dev.tfvars
+      # Ya no necesitas el 'cd infra'
+      run: terraform plan -var-file=env/dev.tfvars
+
   apply:
     needs: terraform
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
+    defaults:
+      run:
+        working-directory: infra
 
     permissions:
       id-token: write
@@ -60,9 +67,8 @@ jobs:
 
     - uses: hashicorp/setup-terraform@v2
 
-    # 🔧 FIX AQUÍ TAMBIÉN
-    - run: terraform init -backend-config=infra/backend.hcl
+    - name: Terraform Init
+      run: terraform init -backend-config=backend.hcl
 
-    - run: |
-       cd infra
-       terraform apply -var-file=env/dev.tfvars -auto-approve
+    - name: Terraform Apply
+      run: terraform apply -var-file=env/dev.tfvars -auto-approve
