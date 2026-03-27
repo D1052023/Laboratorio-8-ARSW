@@ -215,10 +215,16 @@ terraform destroy -var-file=env/dev.tfvars
 
 ---
 
-## Preguntas de reflexión
-- ¿Por qué L4 LB vs Application Gateway (L7) en tu caso? ¿Qué cambiaría?
-- ¿Qué implicaciones de seguridad tiene exponer 22/TCP? ¿Cómo mitigarlas?
-- ¿Qué mejoras harías si esto fuera **producción**? (resiliencia, autoscaling, observabilidad).
+## 🧠 Preguntas de reflexión
+
+- **¿Por qué L4 LB vs Application Gateway (L7) en tu caso? ¿Qué cambiaría?**  
+Se utilizó un Load Balancer de capa 4 porque el escenario solo requiere distribuir tráfico entre varias máquinas virtuales sin necesidad de inspeccionar el contenido de las solicitudes. Este tipo de balanceador opera a nivel de red (TCP/UDP), lo que lo hace más sencillo de configurar y más económico. Es suficiente cuando solo se busca alta disponibilidad básica. Cambiaría a Application Gateway (L7) en un escenario donde se necesite trabajar con tráfico HTTP/HTTPS de forma más inteligente, por ejemplo, con enrutamiento por rutas (`/api`, `/web`), terminación TLS, o integración con WAF para proteger la aplicación.
+
+- **¿Qué implicaciones de seguridad tiene exponer 22/TCP? ¿Cómo mitigarlas?**  
+Exponer el puerto 22/TCP (SSH) directamente a internet implica riesgos como ataques de fuerza bruta, escaneos automatizados y posibles accesos no autorizados a las máquinas virtuales. Esto puede comprometer la seguridad de toda la infraestructura si no se controla adecuadamente. Para mitigarlo, se implementa Azure Bastion, que permite conectarse a las VMs sin necesidad de asignarles una IP pública. Además, se utiliza autenticación mediante claves SSH en lugar de contraseñas, y se pueden aplicar reglas de red (NSG) para restringir el acceso únicamente a fuentes confiables.
+
+- **¿Qué mejoras harías si esto fuera producción? (resiliencia, autoscaling, observabilidad)**  
+En un entorno de producción, se mejorarían varios aspectos. Para resiliencia, se usarían VM Scale Sets y se distribuirían las instancias en múltiples zonas de disponibilidad para evitar puntos únicos de falla. En cuanto a autoscaling, se configuraría el escalado automático basado en métricas como uso de CPU o número de solicitudes, permitiendo ajustar la capacidad según la demanda. Para observabilidad, se integraría Azure Monitor con logs centralizados, métricas y alertas, lo que facilitaría detectar fallos, analizar rendimiento y reaccionar rápidamente ante incidentes.
 
 ---
 
