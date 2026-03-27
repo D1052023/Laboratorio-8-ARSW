@@ -2,6 +2,7 @@
 **Curso:** BluePrints / ARSW  
 **Duración estimada:** 2–3 horas (base) + 1–2 horas (retos)  
 **Última actualización:** 2025-11-09
+**Última actualización:** oscar andres sanchez porras
 
 ## Propósito
 Modernizar el laboratorio de balanceo de carga en Azure usando **Terraform** para definir, aprovisionar y versionar la infraestructura. El objetivo es que los estudiantes diseñen y desplieguen una arquitectura reproducible, segura y con buenas prácticas de _IaC_.
@@ -181,6 +182,9 @@ El _workflow_ `.github/workflows/terraform.yml`:
 3. **URL/IP pública** del Load Balancer + **captura** mostrando respuesta de **2 VMs** (p. ej. refrescar y ver hostnames cambiar).
 4. **Reflexión técnica** (1 página máx.): decisiones, trade‑offs, costos aproximados y cómo destruir seguro.
 5. **Limpieza**: confirmar `terraform destroy` al finalizar.
+
+
+[📄 Ver documentación (PDF)](docs/terraforminit.pdf)
 
 ---
 
